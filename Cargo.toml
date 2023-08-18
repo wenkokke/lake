@@ -1,0 +1,7 @@
+[package]
+name = "lake"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+petgraph = { version = "^0.6.3", features = ["stable_graph"] }
