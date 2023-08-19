@@ -15,7 +15,8 @@ common warnings
 
 library
   import:           warnings
-  exposed-modules:
+  exposed-modules:  Lib
+  other-modules:
     Language.Lake.AST
     Language.Lake.AST.DeBruijn
     Language.Lake.Generator
@@ -27,13 +28,4 @@ library
     , testing-feat  ^>=1.1.1.1
 
   hs-source-dirs:   src
-  default-language: Haskell2010
-
-executable generator
-  import:           warnings
-  main-is:          app/Main.hs
-  build-depends:
-    , base
-    , generator
-
   default-language: Haskell2010

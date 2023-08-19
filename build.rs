@@ -4,6 +4,12 @@ use std::path::Path;
 use std::path::PathBuf;
 use walkdir::{DirEntry, WalkDir};
 
+fn main() {
+    ts_build();
+}
+
+// Build tree-sitter-lake
+
 // The name of the language.
 const LANGUAGE: &str = "lake";
 
@@ -11,7 +17,7 @@ const LANGUAGE: &str = "lake";
 // https://github.com/tree-sitter/tree-sitter/blob/ab09ae20d640711174b8da8a654f6b3dec93da1a/cli/src/main.rs#L18
 const DEFAULT_GENERATE_ABI_VERSION: usize = 14;
 
-fn main() {
+fn ts_build() {
     let source_directory = format!("tree-sitter-{}", LANGUAGE);
     let source_directory = Path::new(&source_directory);
     let output_directory = env::var_os("OUT_DIR").unwrap();
@@ -19,7 +25,7 @@ fn main() {
     ts_copy(&source_directory, &output_directory);
     let package_directory = output_directory.join(source_directory);
     ts_generate(&package_directory);
-    ts_build(&package_directory);
+    ts_compile(&package_directory);
 }
 
 fn ts_copy(source_directory: &Path, target_directory: &Path) {
@@ -62,7 +68,7 @@ fn ts_generate(repo_path: &PathBuf) {
     .unwrap();
 }
 
-fn ts_build(package_directory: &PathBuf) {
+fn ts_compile(package_directory: &PathBuf) {
     let source_directory = package_directory.join("src");
     let parser_file = source_directory.join("parser.c");
     let parser_file = parser_file.to_str().unwrap();
