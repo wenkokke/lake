@@ -1,0 +1,39 @@
+cabal-version:   3.0
+name:            generator
+version:         0.0.1.0
+synopsis:        Lake program generator for testing.
+license-file:    LICENSE.md
+author:          Wen Kokke
+maintainer:      wenkokke@users.noreply.github.com
+copyright:       2023 (c) Wen Kokke
+category:        Testing
+build-type:      Simple
+extra-doc-files: LICENSE.md
+
+common warnings
+  ghc-options: -Wall
+
+library
+  import:           warnings
+  exposed-modules:
+    Language.Lake.AST
+    Language.Lake.AST.DeBruijn
+    Language.Lake.Generator
+
+  build-depends:
+    , base          ^>=4.17.0.0
+    , lazy-search   ^>=0.1.3.0
+    , size-based    ^>=0.1.3.1
+    , testing-feat  ^>=1.1.1.1
+
+  hs-source-dirs:   src
+  default-language: Haskell2010
+
+executable generator
+  import:           warnings
+  main-is:          app/Main.hs
+  build-depends:
+    , base
+    , generator
+
+  default-language: Haskell2010
