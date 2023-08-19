@@ -1,0 +1,5 @@
+EXPORTS
+  generator_lake_new
+  generator_lake_free
+  generator_lake_init
+  generator_lake_exit

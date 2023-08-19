@@ -1,2 +1,2 @@
 packages:
-  generator/generator.cabal
+  generator-lake/generator-lake.cabal

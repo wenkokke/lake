@@ -1,5 +1,5 @@
 cabal-version:   3.0
-name:            generator
+name:            generator-lake
 version:         0.0.1.0
 synopsis:        Lake program generator for testing.
 license-file:    LICENSE.md
@@ -7,19 +7,38 @@ author:          Wen Kokke
 maintainer:      wenkokke@users.noreply.github.com
 copyright:       2023 (c) Wen Kokke
 category:        Testing
-build-type:      Simple
+build-type:      Custom
 extra-doc-files: LICENSE.md
+
+custom-setup
+  setup-depends:
+    , base       >=4
+    , Cabal      >=2.0.0.2
+    , directory  >=1
+    , filepath   >=1
 
 common warnings
   ghc-options: -Wall
 
-library
+foreign-library generator-lake
   import:           warnings
-  exposed-modules:  Lib
+  type:             native-shared
+  c-sources:        cbits/Lib.c
+
+  -- 01-04-2023:
+  -- Standalone builds appear to work with macOS builds of GHC
+  if os(osx)
+    options: standalone
+
+  if os(windows)
+    options:      standalone
+    mod-def-file: cbits/Lib.def
+
   other-modules:
     Language.Lake.AST
     Language.Lake.AST.DeBruijn
     Language.Lake.Generator
+    Lib
 
   build-depends:
     , base          ^>=4.17.0.0
