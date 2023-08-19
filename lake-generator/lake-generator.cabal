@@ -1,5 +1,5 @@
 cabal-version:   3.0
-name:            generator-lake
+name:            lake-generator
 version:         0.0.1.0
 synopsis:        Lake program generator for testing.
 license-file:    LICENSE.md
@@ -20,7 +20,7 @@ custom-setup
 common warnings
   ghc-options: -Wall
 
-foreign-library generator-lake
+foreign-library lake-generator
   import:           warnings
   type:             native-shared
   c-sources:        cbits/Lib.c
