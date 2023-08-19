@@ -1,0 +1,23 @@
+{
+  "private": true,
+  "name": "tree-sitter-lake",
+  "version": "0.1.0",
+  "description": "Lake grammar for the tree-sitter parsing library.",
+  "main": "grammar.js",
+  "scripts": {
+    "build": "tree-sitter generate"
+  },
+  "keywords": [
+    "incremental",
+    "parsing",
+    "lake"
+  ],
+  "author": "Wen Kokke",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "nan": "^2.17.0"
+  },
+  "devDependencies": {
+    "tree-sitter-cli": "^0.20.8"
+  }
+}

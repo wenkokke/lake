@@ -2,6 +2,12 @@
 name = "lake"
 version = "0.1.0"
 edition = "2021"
+license-file = "LICENSE.md"
 
 [dependencies]
-petgraph = { version = "^0.6.3", features = ["stable_graph"] }
+tree-sitter = "^0.20.10"
+
+[build-dependencies]
+cc = "^1.0"
+tree-sitter-cli = "^0.20.8"
+walkdir = "^2"
