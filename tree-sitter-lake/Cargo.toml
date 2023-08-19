@@ -4,9 +4,8 @@ description = "Lake grammar for the tree-sitter parsing library"
 version = "0.1.0"
 keywords = ["incremental", "parsing", "lake"]
 categories = ["parsing", "text-editors"]
-repository = "https://github.com/tree-sitter/tree-sitter-lake"
 edition = "2018"
-license = "MIT"
+license-file = "LICENSE.md"
 build = "bindings/rust/build.rs"
 include = ["bindings/rust/*", "grammar.js", "queries/*", "src/*"]
 
