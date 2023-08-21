@@ -1,5 +1,9 @@
 EXPORTS
-  generator_lake_new
-  generator_lake_free
-  generator_lake_init
-  generator_lake_exit
+  hs_init
+  hs_exit
+  lake_generator_new
+  lake_generator_free
+  lake_generator_size
+  lake_generator_count
+  lake_generator_value
+  lake_generator_next

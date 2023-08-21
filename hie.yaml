@@ -1,4 +1,4 @@
 cradle:
   cabal:
-    - path: "./generator-lake/"
-      component: "generator-lake"
+    - path: "./lake-generator/"
+      component: "lake-generator"

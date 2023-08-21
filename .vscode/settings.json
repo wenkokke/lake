@@ -2,6 +2,8 @@
   "rust-analyzer.linkedProjects": [
     "./Cargo.toml",
     "./Cargo.toml",
+    "./lake-generator/Cargo.toml",
+    "./lake-generator/Cargo.toml",
     "./lake-generator/Cargo.toml"
   ]
 }

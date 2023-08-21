@@ -9,7 +9,7 @@ import Distribution.Simple (UserHooks (..), defaultMainWithHooks, simpleUserHook
 import Distribution.Simple.LocalBuildInfo (componentBuildDir)
 import Distribution.Simple.Setup (BuildFlags (..), fromFlagOrDefault)
 import Distribution.Simple.Utils (die', info)
-import Distribution.Types.LocalBuildInfo (componentNameCLBIs)
+import Distribution.Types.LocalBuildInfo (LocalBuildInfo (..), componentNameCLBIs)
 import Distribution.Types.UnqualComponentName (UnqualComponentName, unUnqualComponentName)
 import Distribution.Verbosity (Verbosity, normal)
 import System.Directory (copyFile, doesDirectoryExist)
@@ -25,20 +25,30 @@ main =
     simpleUserHooks
       { postBuild = \args buildFlags packageDescription localBuildInfo -> do
           let verbosity = fromFlagOrDefault normal (buildVerbosity buildFlags)
-          maybeInstallDir <- getInstallDir verbosity
-          for_ maybeInstallDir $ \installDir -> do
-            let PackageDescription {foreignLibs} = packageDescription
-            for_ foreignLibs $ \foreignLib -> do
-              let ForeignLib {foreignLibName} = foreignLib
-              let foreignLibCLBIs = componentNameCLBIs localBuildInfo (CFLibName foreignLibName)
-              for_ foreignLibCLBIs $ \foreignLibCLBI -> do
-                let foreignLibBuildDir = componentBuildDir localBuildInfo foreignLibCLBI
-                let foreignLibFileName = getForeignLibFileName foreignLibName
-                let foreignLibBuildPath = foreignLibBuildDir </> foreignLibFileName
-                let foreignLibInstallPath = installDir </> foreignLibFileName
-                info verbosity $ "Installing " <> foreignLibFileName <> " to " <> installDir
-                copyFile foreignLibBuildPath foreignLibInstallPath
+          maybeOutDir <- getOutDir verbosity
+          for_ maybeOutDir $ \outDir -> do
+            copyForeignHeader verbosity packageDescription localBuildInfo outDir
+            copyForeignLib verbosity packageDescription localBuildInfo outDir
       }
+
+copyForeignHeader :: Verbosity -> PackageDescription -> LocalBuildInfo -> FilePath -> IO ()
+copyForeignHeader verbosity packageDescription localBuildInfo outDir = do
+  info verbosity $ show localBuildInfo
+  return ()
+
+copyForeignLib :: Verbosity -> PackageDescription -> LocalBuildInfo -> FilePath -> IO ()
+copyForeignLib verbosity packageDescription localBuildInfo outDir = do
+  let PackageDescription {foreignLibs} = packageDescription
+  for_ foreignLibs $ \foreignLib -> do
+    let ForeignLib {foreignLibName} = foreignLib
+    let foreignLibCLBIs = componentNameCLBIs localBuildInfo (CFLibName foreignLibName)
+    for_ foreignLibCLBIs $ \foreignLibCLBI -> do
+      let foreignLibBuildDir = componentBuildDir localBuildInfo foreignLibCLBI
+      let foreignLibFileName = getForeignLibFileName foreignLibName
+      let foreignLibBuildPath = foreignLibBuildDir </> foreignLibFileName
+      let foreignLibInstallPath = outDir </> foreignLibFileName
+      info verbosity $ "Installing " <> foreignLibFileName <> " to " <> outDir
+      copyFile foreignLibBuildPath foreignLibInstallPath
 
 getForeignLibFileName :: UnqualComponentName -> FilePath
 getForeignLibFileName foreignLibName
@@ -48,17 +58,17 @@ getForeignLibFileName foreignLibName
   where
     libName = unUnqualComponentName foreignLibName
 
-getInstallDir :: Verbosity -> IO (Maybe FilePath)
-getInstallDir verbosity =
-  handle doesNotExistErrorHandler unsafeGetInstallDir
+getOutDir :: Verbosity -> IO (Maybe FilePath)
+getOutDir verbosity =
+  handle doesNotExistErrorHandler unsafeGetOutDir
   where
-    unsafeGetInstallDir = do
-      installDir <- getEnv "INSTALLDIR"
-      installDirExists <- doesDirectoryExist installDir
-      unless installDirExists $
+    unsafeGetOutDir = do
+      outDir <- getEnv "OUT_DIR"
+      outDirExists <- doesDirectoryExist outDir
+      unless outDirExists $
         die' verbosity $
-          "INSTALLDIR '" <> installDir <> "' does not exist"
-      return $ Just installDir
+          "OUT_DIR '" <> outDir <> "' does not exist"
+      return $ Just outDir
 
     doesNotExistErrorHandler e =
       if isDoesNotExistError e then return Nothing else throwIO e

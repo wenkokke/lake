@@ -23,7 +23,6 @@ common warnings
 foreign-library lake-generator
   import:           warnings
   type:             native-shared
-  c-sources:        cbits/Lib.c
 
   -- 01-04-2023:
   -- Standalone builds appear to work with macOS builds of GHC
@@ -40,6 +39,7 @@ foreign-library lake-generator
     Language.Lake.Generator
     Lib
 
+  includes:         cbits/Lib.h
   build-depends:
     , base          ^>=4.17.0.0
     , lazy-search   ^>=0.1.3.0

@@ -1,88 +1,46 @@
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+
+{-# HLINT ignore "Use camelCase" #-}
 module Lib where
 
-import Data.Maybe (listToMaybe)
+import Data.Maybe (fromMaybe)
 import Foreign.C.String (CString, newCString)
-import Foreign.C.Types (CUShort (..), CULong (..))
-import Foreign.StablePtr (StablePtr, newStablePtr, deRefStablePtr, freeStablePtr)
-import Language.Lake.AST (AST)
-import Language.Lake.AST.DeBruijn (Z)
-import Language.Lake.Generator (allValues)
+import Foreign.C.Types (CBool (..))
+import Foreign.Marshal (fromBool)
+import Foreign.StablePtr (StablePtr, deRefStablePtr, freeStablePtr, newStablePtr)
+import Language.Lake.Generator
+  ( Generator (..),
+    emptyGenerator,
+    getNext,
+    getValue,
+    hasNext,
+    newGenerator,
+  )
 
-data Generator = Generator
-  { size :: Int,
-    count :: Integer,
-    values :: [AST Z],
-    next :: [(Integer, [AST Z])]
-  }
+foreign export ccall lake_generator_new :: IO (StablePtr Generator)
 
-foreign export ccall newGenerator :: IO (StablePtr Generator)
+lake_generator_new :: IO (StablePtr Generator)
+lake_generator_new = newStablePtr newGenerator
 
-emptyGenerator :: Generator
-emptyGenerator = Generator
-  {
-    size = 0,
-    count = 0,
-    values = [],
-    next = []
-  }
+foreign export ccall lake_generator_free :: StablePtr Generator -> IO ()
 
-newGenerator :: IO (StablePtr Generator)
-newGenerator = newStablePtr emptyGenerator { next = allValues }
+lake_generator_free :: StablePtr Generator -> IO ()
+lake_generator_free = freeStablePtr
 
-foreign export ccall freeGenerator :: StablePtr Generator -> IO ()
+foreign export ccall lake_generator_has_next :: StablePtr Generator -> IO CBool
 
-freeGenerator :: StablePtr Generator -> IO ()
-freeGenerator = freeStablePtr 
+lake_generator_has_next :: StablePtr Generator -> IO CBool
+lake_generator_has_next stablePtrGenerator =
+  fromBool . hasNext <$> deRefStablePtr stablePtrGenerator
 
-foreign export ccall getSize :: StablePtr Generator -> IO CUShort
+foreign export ccall lake_generator_value :: StablePtr Generator -> IO CString
 
-getSize :: StablePtr Generator -> IO CUShort
-getSize stablePtrGenerator = do
-  generator <- deRefStablePtr stablePtrGenerator
-  return . fromIntegral $ size generator
+lake_generator_value :: StablePtr Generator -> IO CString
+lake_generator_value stablePtrGenerator = do
+  newCString . maybe "" show . getValue =<< deRefStablePtr stablePtrGenerator
 
-foreign export ccall getCount :: StablePtr Generator -> IO CULong
+foreign export ccall lake_generator_next :: StablePtr Generator -> IO (StablePtr Generator)
 
-getCount :: StablePtr Generator -> IO CULong
-getCount stablePtrGenerator = do
-  generator <- deRefStablePtr stablePtrGenerator
-  return . fromIntegral $ count generator
-
-foreign export ccall getValue :: StablePtr Generator -> IO CString
-
-getValue :: StablePtr Generator -> IO CString
-getValue stablePtrGenerator = do
-  generator <- deRefStablePtr stablePtrGenerator
-  let valueString = maybe "" show (listToMaybe $ values generator)
-  newCString valueString
-
-foreign export ccall nextValue :: StablePtr Generator -> IO (StablePtr Generator)
-
-nextValue :: StablePtr Generator -> IO (StablePtr Generator)
-nextValue stablePtrGenerator = do
-  generator <- deRefStablePtr stablePtrGenerator
-  let nextCount = max 0 (count generator + 1)
-  let nextValues = drop 1 (values generator)
-  newStablePtr generator
-    {
-      count = nextCount,
-      values = nextValues
-    }
-
-foreign export ccall nextSize :: StablePtr Generator -> IO (StablePtr Generator)
-
-nextSize :: StablePtr Generator -> IO (StablePtr Generator)
-nextSize stablePtrGenerator = do
-  generator <- deRefStablePtr stablePtrGenerator
-  let nextGenerator =
-        case next generator of
-          [] -> emptyGenerator
-          ((nextCount, nextValues) : nextNext) ->
-            Generator
-              {
-                size = succ (size generator),
-                count = nextCount,
-                values = nextValues,
-                next = nextNext
-              }
-  newStablePtr nextGenerator
+lake_generator_next :: StablePtr Generator -> IO (StablePtr Generator)
+lake_generator_next stablePtrGenerator = do
+  newStablePtr . fromMaybe emptyGenerator . getNext =<< deRefStablePtr stablePtrGenerator
