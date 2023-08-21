@@ -54,8 +54,7 @@ mod tests {
 
     #[test]
     fn it_works() {
-        let generator = Generator::new();
-        for value in Iterator::take(generator, 100) {
+        for value in Generator::new().take(100) {
             println!("{:?}", value)
         }
     }
