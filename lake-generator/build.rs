@@ -1,3 +1,4 @@
+use glob::glob;
 use std::env;
 use std::path::PathBuf;
 use std::process::Command;
@@ -11,7 +12,21 @@ fn main() {
 }
 
 fn run_cabal() {
+    // Get the output directory
     let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
+
+    // Tell cargo to rebuild if the .cabal or any .hs files change
+    println!("cargo:rerun-if-changed={}", "lake-generator.cabal");
+    for entry in glob("**/*.hs").expect("Failed to read glob pattern") {
+        match entry {
+            Ok(source_file) => {
+                println!("cargo:rerun-if-changed={}", source_file.to_str().unwrap())
+            }
+            Err(e) => {
+                println!("cargo:warning={}", e)
+            }
+        }
+    }
 
     // Build the foreign library with Cabal
     let opt_builddir = format!(

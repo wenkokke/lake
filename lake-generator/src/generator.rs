@@ -1,4 +1,6 @@
+use crate::ast::AST;
 use crate::bindings;
+use serde_json::de;
 use std::{ffi::CStr, ptr::null_mut};
 
 pub struct Generator {
@@ -25,7 +27,7 @@ impl Drop for Generator {
 }
 
 impl Iterator for Generator {
-    type Item = String;
+    type Item = AST;
 
     fn next(&mut self) -> Option<Self::Item> {
         if !self.has_next() {
@@ -37,10 +39,10 @@ impl Iterator for Generator {
             if value_ptr.is_null() {
                 return None;
             } else {
-                let value_cstr = unsafe { CStr::from_ptr(value_ptr) };
-                let value_string = String::from(value_cstr.to_str().unwrap());
+                let value: AST =
+                    de::from_slice(unsafe { CStr::from_ptr(value_ptr) }.to_bytes()).unwrap();
                 unsafe { bindings::lake_generator_value_free(value_ptr) };
-                Some(value_string)
+                Some(value)
             }
         }
     }
@@ -53,8 +55,8 @@ mod tests {
     #[test]
     fn it_works() {
         let generator = Generator::new();
-        for value in Iterator::take(generator, 10) {
-            println!("{}", value)
+        for value in Iterator::take(generator, 100) {
+            println!("{:?}", value)
         }
     }
 }

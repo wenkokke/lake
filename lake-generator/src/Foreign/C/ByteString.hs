@@ -14,4 +14,4 @@ newCStringFromByteString (BS foreignPtrPayload l) = do
   withForeignPtr foreignPtrPayload $ \payload -> do
     copyBytes buffer payload l
     pokeByteOff buffer (l + 1) (0 :: Word8)
-    return $ castPtr buffer
+    return (castPtr buffer)

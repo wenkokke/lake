@@ -8,7 +8,7 @@ where
 
 import Control.Enumerable (Enumerable (..), Shared, Sized (..), c1, c2, share)
 import Data.Aeson (Value)
-import Data.Aeson.Types (Options (..), SumEncoding (..), ToJSON (..), defaultOptions, genericToJSON)
+import Data.Aeson.Types (Encoding, Options (..), SumEncoding (..), ToJSON (..), defaultOptions, genericToEncoding, genericToJSON)
 import Data.Data (Typeable)
 import GHC.Generics (Generic)
 import Language.Lake.AST.DeBruijn (IsNatural, S (..))
@@ -43,3 +43,6 @@ options =
 instance (IsNatural n, ToJSON n) => ToJSON (AST n) where
   toJSON :: (IsNatural n, ToJSON n) => AST n -> Value
   toJSON = genericToJSON options
+
+  toEncoding :: (IsNatural n, ToJSON n) => AST n -> Encoding
+  toEncoding = genericToEncoding options
