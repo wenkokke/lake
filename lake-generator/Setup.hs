@@ -1,3 +1,11 @@
+#!/usr/bin/env cabal
+{- cabal:
+build-depends:
+    , base       >=4
+    , Cabal      >=2.0.0.2
+    , directory  >=1
+    , filepath   >=1
+-}
 {-# LANGUAGE NamedFieldPuns #-}
 
 import Control.Exception (catch, handle, throwIO)

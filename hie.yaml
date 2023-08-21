@@ -1,4 +1,20 @@
 cradle:
-  cabal:
-    - path: "./lake-generator/"
-      component: "lake-generator"
+  multi:
+    # lake-generator
+    - path: "./lake-generator/src"
+      config:
+        cradle:
+          cabal:
+            component: "lake-generator"
+
+    # lake-generator:Setup.hs
+    - path: "./lake-generator/Setup.hs"
+      config:
+        cradle:
+          cabal:
+
+    # ignore
+    - path: "./"
+      config:
+        cradle:
+          none:
