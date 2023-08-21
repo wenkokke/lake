@@ -1,29 +1,26 @@
-use crate::bindings::{
-    hs_exit, hs_init, lake_generator_free, lake_generator_has_next, lake_generator_new,
-    lake_generator_next, lake_generator_value, HsGenerator,
-};
+use crate::bindings;
 use std::{ffi::CStr, ptr::null_mut};
 
 pub struct Generator {
-    raw: HsGenerator,
+    generator_ptr: bindings::Generator,
 }
 
 impl Generator {
     pub fn new() -> Generator {
         HaskellRuntime::init();
         Generator {
-            raw: unsafe { lake_generator_new() },
+            generator_ptr: unsafe { bindings::lake_generator_new() },
         }
     }
     pub fn has_next(&self) -> bool {
-        let value = unsafe { lake_generator_has_next(self.raw) };
+        let value = unsafe { bindings::lake_generator_has_next(self.generator_ptr) };
         value > 0
     }
 }
 
 impl Drop for Generator {
     fn drop(&mut self) {
-        unsafe { lake_generator_free(self.raw) };
+        unsafe { bindings::lake_generator_free(self.generator_ptr) };
     }
 }
 
@@ -34,13 +31,16 @@ impl Iterator for Generator {
         if !self.has_next() {
             return None;
         } else {
-            self.raw = unsafe { lake_generator_next(self.raw) };
-            let value = unsafe { lake_generator_value(self.raw) };
-            if value.is_null() {
+            self.generator_ptr = unsafe { bindings::lake_generator_next(self.generator_ptr) };
+            let value_ptr: bindings::Value =
+                unsafe { bindings::lake_generator_value(self.generator_ptr) };
+            if value_ptr.is_null() {
                 return None;
             } else {
-                let value = unsafe { CStr::from_ptr(value) };
-                Some(String::from(value.to_str().unwrap()))
+                let value_cstr = unsafe { CStr::from_ptr(value_ptr) };
+                let value_string = String::from(value_cstr.to_str().unwrap());
+                unsafe { bindings::lake_generator_value_free(value_ptr) };
+                Some(value_string)
             }
         }
     }
@@ -70,13 +70,13 @@ impl HaskellRuntime {
         if unsafe { HASKELL_RUNTIME.is_some() } {
             return;
         }
-        unsafe { hs_init(null_mut(), null_mut()) };
+        unsafe { bindings::hs_init(null_mut(), null_mut()) };
         unsafe { HASKELL_RUNTIME.insert(HaskellRuntime {}) };
     }
 }
 
 impl Drop for HaskellRuntime {
     fn drop(&mut self) {
-        unsafe { hs_exit() };
+        unsafe { bindings::hs_exit() };
     }
 }

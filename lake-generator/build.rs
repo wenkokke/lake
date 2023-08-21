@@ -14,7 +14,14 @@ fn run_cabal() {
     let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
 
     // Build the foreign library with Cabal
-    Command::new("cabal").args(["v2-build"]).status().unwrap();
+    let opt_builddir = format!(
+        "--builddir={}",
+        out_dir.join("dist-newstyle").to_str().unwrap()
+    );
+    Command::new("cabal")
+        .args(["v2-build", &opt_builddir])
+        .status()
+        .unwrap();
 
     // Tell cargo to link against the compiled Haskell library
     println!("cargo:rustc-link-search={}", out_dir.to_str().unwrap());

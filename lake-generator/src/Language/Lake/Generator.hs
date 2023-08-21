@@ -1,16 +1,15 @@
 module Language.Lake.Generator
-  ( Generator (size, count),
-    emptyGenerator,
-    newGenerator,
-    getValue,
+  ( Generator,
+    empty,
+    new,
+    value,
     hasNext,
-    getNext,
+    next,
   )
 where
 
-import Control.Applicative (Alternative (..))
 import Control.Enumerable (global)
-import Data.Maybe (isJust, listToMaybe)
+import Data.Maybe (fromMaybe, isJust, listToMaybe)
 import Language.Lake.AST (AST)
 import Language.Lake.AST.DeBruijn (Z)
 import Test.Feat.Access (valuesWith)
@@ -22,8 +21,8 @@ data Generator = Generator
     nextData :: [(Integer, [AST Z])]
   }
 
-emptyGenerator :: Generator
-emptyGenerator =
+empty :: Generator
+empty =
   Generator
     { size = 0,
       count = 0,
@@ -31,21 +30,24 @@ emptyGenerator =
       nextData = []
     }
 
-newGenerator :: Generator
-newGenerator = emptyGenerator {nextData = valuesWith global}
+new :: Generator
+new = fromMaybe empty (next generator)
+  where
+    generator = empty {nextData = valuesWith global}
 
-getValue :: Generator -> Maybe (AST Z)
-getValue generator = listToMaybe (values generator)
+value :: Generator -> Maybe (AST Z)
+value generator = listToMaybe (values generator)
 
 hasNext :: Generator -> Bool
-hasNext = isJust . getNext
+hasNext = isJust . next
 
-getNext :: Generator -> Maybe Generator
-getNext generator = getNextValue generator <|> getNextSize generator
+next :: Generator -> Maybe Generator
+next = nextValue
 
-getNextValue :: Generator -> Maybe Generator
-getNextValue generator = case values generator of
-  [] -> Nothing
+nextValue :: Generator -> Maybe Generator
+nextValue generator = case values generator of
+  [] -> nextSize generator
+  [_] -> nextSize generator
   (_ : rest) ->
     Just $
       generator
@@ -53,8 +55,8 @@ getNextValue generator = case values generator of
           values = rest
         }
 
-getNextSize :: Generator -> Maybe Generator
-getNextSize generator = case nextData generator of
+nextSize :: Generator -> Maybe Generator
+nextSize generator = case nextData generator of
   [] -> Nothing
   ((nextCount, nextValues) : nextNextData) ->
     Just $

@@ -34,6 +34,7 @@ foreign-library lake-generator
     mod-def-file: cbits/Lib.def
 
   other-modules:
+    Foreign.C.ByteString
     Language.Lake.AST
     Language.Lake.AST.DeBruijn
     Language.Lake.Generator
@@ -41,10 +42,14 @@ foreign-library lake-generator
 
   includes:         cbits/Lib.h
   build-depends:
-    , base          ^>=4.17.0.0
-    , lazy-search   ^>=0.1.3.0
-    , size-based    ^>=0.1.3.1
-    , testing-feat  ^>=1.1.1.1
+    , aeson         >=2.1.2   && <2.2
+    , base          >=4.17    && <5
+    , bytestring    >=0.11.4  && <0.12
+    , cborg         >=0.2.9   && <0.3
+    , cborg-json    >=0.2.5   && <0.3
+    , lazy-search   >=0.1.3.0 && <0.2
+    , size-based    >=0.1.3.1 && <0.2
+    , testing-feat  >=1.1.1.1 && <1.2
 
   hs-source-dirs:   src
   default-language: Haskell2010

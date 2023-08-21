@@ -1,16 +1,23 @@
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE InstanceSigs #-}
 
-module Language.Lake.AST where
+module Language.Lake.AST
+  ( AST (..),
+  )
+where
 
 import Control.Enumerable (Enumerable (..), Shared, Sized (..), c1, c2, share)
+import Data.Aeson (Value)
+import Data.Aeson.Types (Options (..), SumEncoding (..), ToJSON (..), defaultOptions, genericToJSON)
 import Data.Data (Typeable)
-import Language.Lake.AST.DeBruijn (S (..))
+import GHC.Generics (Generic)
+import Language.Lake.AST.DeBruijn (IsNatural, S (..))
 
 data AST n
   = Var n
   | Lam (AST (S n))
   | App (AST n) (AST n)
-  deriving (Typeable, Show)
+  deriving (Generic, Typeable, Show)
 
 -- Instances of 'Enumerable'
 
@@ -23,3 +30,16 @@ instance (Enumerable n) => Enumerable (AST n) where
           pay (c1 Lam),
           pay (c2 App)
         ]
+
+-- Instances of 'ToJSON'
+
+options :: Options
+options =
+  defaultOptions
+    { sumEncoding = ObjectWithSingleField,
+      tagSingleConstructors = True
+    }
+
+instance (IsNatural n, ToJSON n) => ToJSON (AST n) where
+  toJSON :: (IsNatural n, ToJSON n) => AST n -> Value
+  toJSON = genericToJSON options
