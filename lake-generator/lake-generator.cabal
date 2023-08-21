@@ -24,6 +24,11 @@ foreign-library lake-generator
   import:           warnings
   type:             native-shared
 
+  -- 21-08-2023:
+  -- Standalone builds are unsupported with most Linux builds of GHC
+  if os(linux)
+    buildable: False
+
   -- 01-04-2023:
   -- Standalone builds appear to work with macOS builds of GHC
   if os(osx)
