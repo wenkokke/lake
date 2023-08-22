@@ -1,17 +1,14 @@
 use std::marker::PhantomData;
 
 use crate::{
-    num::{nat::Nat, one::One, pred::Pred, succ::Succ, zero::Zero},
+    num::{one::One, pred::Pred, succ::Succ, zero::Zero},
     type_nat::{TypeNat, S},
 };
 
 pub type DefaultIx = u32;
 
 #[derive(Eq, PartialEq)]
-pub struct DeBruijn<N: TypeNat, Ix = DefaultIx> {
-    pub(crate) ix: Ix,
-    pub(crate) pd: PhantomData<N>,
-}
+pub struct DeBruijn<N: TypeNat, Ix = DefaultIx>(pub(crate) Ix, pub(crate) PhantomData<N>);
 
 impl<N, Ix> Zero for DeBruijn<S<N>, Ix>
 where
@@ -19,14 +16,11 @@ where
     Ix: Zero,
 {
     fn zero() -> DeBruijn<S<N>, Ix> {
-        DeBruijn {
-            ix: <Ix as Zero>::zero(),
-            pd: PhantomData::<S<N>>,
-        }
+        DeBruijn(<Ix as Zero>::zero(), PhantomData::<S<N>>)
     }
 
     fn is_zero(&self) -> bool {
-        self.ix.is_zero()
+        self.0.is_zero()
     }
 }
 
@@ -36,10 +30,7 @@ where
     Ix: One,
 {
     fn one() -> DeBruijn<S<N>, Ix> {
-        DeBruijn {
-            ix: <Ix as One>::one(),
-            pd: PhantomData::<S<N>>,
-        }
+        DeBruijn(<Ix as One>::one(), PhantomData::<S<N>>)
     }
 }
 
@@ -51,10 +42,7 @@ where
     type Output = DeBruijn<S<N>, Ix>;
 
     fn succ(self) -> Self::Output {
-        DeBruijn {
-            ix: self.ix.succ(),
-            pd: PhantomData::<S<N>>,
-        }
+        DeBruijn(self.0.succ(), PhantomData::<S<N>>)
     }
 }
 
@@ -66,18 +54,6 @@ where
     type Output = DeBruijn<N, Ix>;
 
     fn pred(self) -> Self::Output {
-        DeBruijn {
-            ix: self.ix.pred().unwrap(),
-            pd: PhantomData::<N>,
-        }
+        DeBruijn(self.0.pred().unwrap(), PhantomData::<N>)
     }
-}
-
-impl<N, Ix> Nat for DeBruijn<S<N>, Ix>
-where
-    N: TypeNat,
-    Ix: Zero + One + Succ<Output = Ix> + Pred<Output = Option<Ix>>,
-{
-    type Succ = DeBruijn<S<S<N>>, Ix>;
-    type Pred = DeBruijn<N, Ix>;
 }

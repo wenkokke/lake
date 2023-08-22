@@ -10,6 +10,13 @@
     "./debruijn/Cargo.toml",
     "./debruijn/Cargo.toml",
     "./debruijn/Cargo.toml",
-    "./debruijn/Cargo.toml"
+    "./debruijn/Cargo.toml",
+    "./binders/Cargo.toml",
+    "./binders/Cargo.toml",
+    "./binders/Cargo.toml",
+    "./binders/Cargo.toml",
+    "./binders/Cargo.toml",
+    "./binders/Cargo.toml",
+    "./binders/Cargo.toml"
   ]
 }

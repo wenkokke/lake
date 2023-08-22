@@ -9,14 +9,7 @@ use crate::{
     type_nat::{TypeNat, S, Z},
 };
 
-pub struct Context<N, V>
-where
-    N: TypeNat,
-    V: Measured,
-{
-    pub(crate) ft: FingerTree<V>,
-    pub(crate) pd: PhantomData<N>,
-}
+pub struct Context<N: TypeNat, V: Measured>(pub(crate) FingerTree<V>, pub(crate) PhantomData<N>);
 
 impl<N, V> IntoIterator for Context<N, V>
 where
@@ -28,7 +21,7 @@ where
     type IntoIter = <FingerTree<V> as IntoIterator>::IntoIter;
 
     fn into_iter(self) -> Self::IntoIter {
-        self.ft.into_iter()
+        self.0.into_iter()
     }
 }
 
@@ -41,7 +34,7 @@ where
     where
         Ix: Zero + Pred<Output = Ix>,
     {
-        let mut ix: Ix = db.ix;
+        let mut ix: Ix = db.0;
         let mut vw: Option<(V, Context<S<N>, V>)> = self.view();
         while !ix.is_zero() {
             ix = ix.pred();
@@ -57,31 +50,19 @@ where
     V: Measured,
 {
     pub fn new() -> Context<Z, V> {
-        Context {
-            ft: FingerTree::new(),
-            pd: PhantomData::<Z>,
-        }
+        Context(FingerTree::new(), PhantomData::<Z>)
     }
 
     pub fn is_empty(&self) -> bool {
-        self.ft.is_empty()
+        self.0.is_empty()
     }
 
     pub fn push(&self, value: V) -> Context<S<N>, V> {
-        Context {
-            ft: self.ft.push_right(value),
-            pd: PhantomData::<S<N>>,
-        }
+        Context(self.0.push_right(value), PhantomData::<S<N>>)
     }
 
     pub fn view(&self) -> Option<(V, Context<N, V>)> {
-        let (hd, tl) = self.ft.view_right()?;
-        Some((
-            hd,
-            Context {
-                ft: tl,
-                pd: PhantomData::<N>,
-            },
-        ))
+        let (hd, tl) = self.0.view_right()?;
+        Some((hd, Context(tl, PhantomData::<N>)))
     }
 }
