@@ -61,13 +61,13 @@ where
 impl<N, Ix> Pred for DeBruijn<S<N>, Ix>
 where
     N: TypeNat,
-    Ix: Pred<Output = Ix>,
+    Ix: Pred<Output = Option<Ix>>,
 {
     type Output = DeBruijn<N, Ix>;
 
     fn pred(self) -> Self::Output {
         DeBruijn {
-            ix: self.ix.pred(),
+            ix: self.ix.pred().unwrap(),
             pd: PhantomData::<N>,
         }
     }
@@ -76,7 +76,7 @@ where
 impl<N, Ix> Nat for DeBruijn<S<N>, Ix>
 where
     N: TypeNat,
-    Ix: Zero + One + Succ<Output = Ix> + Pred<Output = Ix>,
+    Ix: Zero + One + Succ<Output = Ix> + Pred<Output = Option<Ix>>,
 {
     type Succ = DeBruijn<S<S<N>>, Ix>;
     type Pred = DeBruijn<N, Ix>;
