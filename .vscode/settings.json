@@ -4,6 +4,12 @@
     "./Cargo.toml",
     "./lake-generator/Cargo.toml",
     "./lake-generator/Cargo.toml",
-    "./lake-generator/Cargo.toml"
+    "./lake-generator/Cargo.toml",
+    "./debruijn/Cargo.toml",
+    "./debruijn/Cargo.toml",
+    "./debruijn/Cargo.toml",
+    "./debruijn/Cargo.toml",
+    "./debruijn/Cargo.toml",
+    "./debruijn/Cargo.toml"
   ]
 }
