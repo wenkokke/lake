@@ -82,6 +82,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a26ae43d7bcc3b814de94796a5e736d4029efb0ee900c12e2d54c993ad1a1e07"
 
 [[package]]
+name = "fingertrees"
+version = "0.2.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8c5f96d9a233f5975be42ce80939d64493e91028a3bfba57b782c2502595ce7f"
+
+[[package]]
 name = "glob"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -97,10 +103,18 @@ checksum = "af150ab688ff2122fcef229be89cb50dd66af9e01a4ff320cc137eecc9bacc38"
 name = "lake"
 version = "0.1.0"
 dependencies = [
+ "lake-binder",
  "lake-generator",
  "serde",
  "tree-sitter",
  "tree-sitter-lake",
+]
+
+[[package]]
+name = "lake-binder"
+version = "0.1.0"
+dependencies = [
+ "fingertrees",
 ]
 
 [[package]]

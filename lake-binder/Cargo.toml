@@ -1,5 +1,5 @@
 [package]
-name = "debruijn"
+name = "lake-binder"
 version = "0.1.0"
 edition = "2021"
 
